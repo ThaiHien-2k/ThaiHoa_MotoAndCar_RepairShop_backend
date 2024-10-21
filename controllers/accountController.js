@@ -1,5 +1,6 @@
 const Account = require("../models/accountModel");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 exports.createAccount = async (req, res) => {
     const { name, email, password, privilege } = req.body;
@@ -140,4 +141,36 @@ exports.getFilteredAccounts = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
+};
+
+exports.login = async (req, res) => {
+    const { email, password } = req.body;
+
+    try {
+        const account = await Account.findOne({ email });
+        if (!account) {
+            return res.status(404).json({ message: "Account not found" });
+        }
+
+        const isMatch = await bcrypt.compare(password, account.password);
+        if (!isMatch) {
+            return res.status(401).json({ message: "Invalid password" });
+        }
+
+        const token = jwt.sign(
+            { id: account._id, privilege: account.privilege },
+            process.env.JWT_SECRET,
+            {
+                expiresIn: "1h",
+            }
+        );
+
+        res.json({ message: "Login successful", token });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+exports.logout = (req, res) => {
+    res.json({ message: "Logout successful" });
 };

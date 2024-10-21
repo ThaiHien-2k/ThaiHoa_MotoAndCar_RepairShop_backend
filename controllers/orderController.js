@@ -56,3 +56,33 @@ exports.getOrdersByUserId = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+// controllers/orderController.js
+
+exports.filterOrders = async (req, res) => {
+    const { userId, minAmount, maxAmount, status } = req.query;
+    let filter = {};
+
+    if (userId) {
+        filter.userId = userId;
+    }
+
+    if (minAmount) {
+        filter.amount = { $gte: minAmount };
+    }
+
+    if (maxAmount) {
+        filter.amount = { ...filter.amount, $lte: maxAmount };
+    }
+
+    if (status) {
+        filter.status = status;
+    }
+
+    try {
+        const orders = await Order.find(filter);
+        res.json(orders);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};

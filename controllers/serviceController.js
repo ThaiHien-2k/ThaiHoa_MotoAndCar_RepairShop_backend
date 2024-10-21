@@ -109,3 +109,33 @@ exports.deleteService = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+// controllers/serviceController.js
+
+exports.filterServices = async (req, res) => {
+    const { description, price, minDuration, maxDuration } = req.query;
+    let filter = {};
+
+    if (description) {
+        filter.description = { $regex: description, $options: "i" }; // case-insensitive search
+    }
+
+    if (price) {
+        filter.price = price;
+    }
+
+    if (minDuration) {
+        filter.duration = { $gte: minDuration };
+    }
+
+    if (maxDuration) {
+        filter.duration = { ...filter.duration, $lte: maxDuration };
+    }
+
+    try {
+        const services = await Service.find(filter);
+        res.json(services);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};

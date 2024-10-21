@@ -101,3 +101,37 @@ exports.getProductById = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+// controllers/productController.js
+
+exports.filterProducts = async (req, res) => {
+    const { category, subcategory, minRate, maxRate, name } = req.query;
+    let filter = {};
+
+    if (category) {
+        filter.category = category;
+    }
+
+    if (subcategory) {
+        filter.subcategory = subcategory;
+    }
+
+    if (minRate) {
+        filter.rate = { $gte: minRate };
+    }
+
+    if (maxRate) {
+        filter.rate = { ...filter.rate, $lte: maxRate };
+    }
+
+    if (name) {
+        filter.name = { $regex: name, $options: "i" }; // case-insensitive search
+    }
+
+    try {
+        const products = await Product.find(filter);
+        res.json(products);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};

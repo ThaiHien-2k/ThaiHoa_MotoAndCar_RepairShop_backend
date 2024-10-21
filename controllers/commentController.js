@@ -50,3 +50,33 @@ exports.getCommentsByProductId = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+// controllers/commentController.js
+
+exports.filterComments = async (req, res) => {
+    const { productId, userId, minRating, maxRating } = req.query;
+    let filter = {};
+
+    if (productId) {
+        filter.productId = productId;
+    }
+
+    if (userId) {
+        filter.userId = userId;
+    }
+
+    if (minRating) {
+        filter.rating = { $gte: minRating };
+    }
+
+    if (maxRating) {
+        filter.rating = { ...filter.rating, $lte: maxRating };
+    }
+
+    try {
+        const comments = await Comment.find(filter);
+        res.json(comments);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};

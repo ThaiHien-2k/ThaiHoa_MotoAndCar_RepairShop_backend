@@ -1,19 +1,17 @@
 const express = require("express");
+const authMiddleware = require("../middleware/auth");
 const {
     createComment,
     deleteComment,
     getCommentsByProductId,
+    filterComments,
 } = require("../controllers/commentController");
 
 const router = express.Router();
 
-// Create a new comment
-router.post("/", createComment);
-
-// Delete a comment by ID
-router.delete("/:id", deleteComment);
-
-// Get comments for a specific product by product ID
+router.post("/", authMiddleware, createComment);
+router.delete("/:id", authMiddleware, deleteComment);
 router.get("/product/:productId", getCommentsByProductId);
+router.get("/filter", filterComments);
 
 module.exports = router;
