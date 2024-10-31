@@ -11,22 +11,22 @@ const {
 
 const router = express.Router();
 
-// Create a new product
+// Create a new product (requires authentication)
 router.post("/", authMiddleware, createProduct);
 
-// Delete a product by ID
+// Delete a product by ID (requires authentication)
 router.delete("/:id", authMiddleware, deleteProduct);
 
-// Update a product by ID
+// Update a product by ID (requires authentication)
 router.put("/:id", authMiddleware, updateProduct);
 
-// Get all products
+// Get all products (public or requires authentication, adjust as needed)
 router.get("/", getAllProducts);
 
-// Get a product by ID
+// Get a product by ID (public or requires authentication, adjust as needed)
 router.get("/:id", getProductById);
 
-// Filter products
+// Filter products (public or requires authentication, adjust as needed)
 router.get("/filter", filterProducts);
 
 module.exports = router;

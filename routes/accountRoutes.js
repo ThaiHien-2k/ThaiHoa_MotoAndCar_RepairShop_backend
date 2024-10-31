@@ -12,29 +12,18 @@ const {
     logout,
 } = require("../controllers/accountController");
 const authMiddleware = require("../middleware/auth");
-const authorizationMiddleware = require("../middleware/authorization");
 
 const router = express.Router();
 
 router.post("/create", createAccount);
-router.delete(
-    "/:id/delete",
-    authMiddleware,
-    authorizationMiddleware("admin"),
-    deleteAccount
-);
-router.put("/:id/password", authMiddleware, changePassword);
-router.put(
-    "/:id/privilege",
-    authMiddleware,
-    authorizationMiddleware("admin"),
-    changePrivilege
-);
-router.put("/:id/rename", authMiddleware, renameAccount);
-router.get("/", authMiddleware, getAllAccounts);
-router.get("/:id", authMiddleware, getAccountById);
-router.get("/filter", authMiddleware, getFilteredAccounts);
+router.delete("/:id/delete", authMiddleware("admin"), deleteAccount);
+router.put("/:id/password", authMiddleware(), changePassword); // No specific privilege needed
+router.put("/:id/privilege", authMiddleware("admin"), changePrivilege);
+router.put("/:id/rename", authMiddleware(), renameAccount); // No specific privilege needed
+router.get("/", authMiddleware(), getAllAccounts); // No specific privilege needed
+router.get("/:id", authMiddleware(), getAccountById); // No specific privilege needed
+router.get("/filter", authMiddleware(), getFilteredAccounts); // No specific privilege needed
 router.post("/login", login);
-router.post("/logout", authMiddleware, logout);
+router.post("/logout", authMiddleware(), logout); // No specific privilege needed
 
 module.exports = router;

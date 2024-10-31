@@ -10,22 +10,22 @@ const {
     filterEmployees,
 } = require("../controllers/employeeController");
 
-// Create a new employee
-router.post("/", authMiddleware, createEmployee);
+// Create a new employee (requires admin privilege)
+router.post("/", authMiddleware("admin"), createEmployee);
 
-// Get all employees
+// Get all employees (requires authentication)
 router.get("/", authMiddleware, getAllEmployees);
 
-// Get employee by ID
+// Get employee by ID (requires authentication)
 router.get("/:id", authMiddleware, getEmployeeById);
 
-// Update employee by ID
-router.put("/:id", authMiddleware, updateEmployee);
+// Update employee by ID (requires admin privilege)
+router.put("/:id", authMiddleware("admin"), updateEmployee);
 
-// Delete employee by ID
-router.delete("/:id", authMiddleware, deleteEmployee);
+// Delete employee by ID (requires admin privilege)
+router.delete("/:id", authMiddleware("admin"), deleteEmployee);
 
-// Filter employees based on query parameters
+// Filter employees based on query parameters (requires authentication)
 router.get("/filter", authMiddleware, filterEmployees);
 
 module.exports = router;

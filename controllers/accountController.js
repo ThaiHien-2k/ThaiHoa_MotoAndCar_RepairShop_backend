@@ -5,7 +5,18 @@ const jwt = require("jsonwebtoken");
 exports.createAccount = async (req, res) => {
     const { name, email, password, privilege } = req.body;
 
+    if (!name || !email || !password) {
+        return res
+            .status(400)
+            .json({ message: "Name, email, and password are required." });
+    }
+
     try {
+        const existingAccount = await Account.findOne({ email });
+        if (existingAccount) {
+            return res.status(400).json({ message: "Email already exists." });
+        }
+
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const newAccount = new Account({
@@ -21,6 +32,7 @@ exports.createAccount = async (req, res) => {
             newAccount,
         });
     } catch (error) {
+        console.error("Error creating account:", error);
         res.status(500).json({ message: error.message });
     }
 };
