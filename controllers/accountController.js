@@ -5,10 +5,10 @@ const jwt = require("jsonwebtoken");
 exports.createAccount = async (req, res) => {
     const { name, email, password, privilege } = req.body;
 
-    if (!name || !email || !password) {
+    if (!email) {
         return res
             .status(400)
-            .json({ message: "Name, email, and password are required." });
+            .json({ message: "Email are required." });
     }
 
     try {
