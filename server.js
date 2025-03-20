@@ -7,10 +7,19 @@ const rateLimit = require("express-rate-limit");
 const accountRoutes = require("./routes/accountRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const productRoutes = require("./routes/productRoutes");
-const productComment = require("./routes/productCommentRoutes");
+const productCommentRoutes = require("./routes/productCommentRoutes");
 const serviceRoutes = require("./routes/serviceRoutes");
 const employeeRoutes = require("./routes/employeeRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
+const repairAppointmentsRoutes = require("./routes/repairAppointmentsRoutes");
+const inventoryRoutes = require("./routes/inventoryRoutes");
+const supplierRoutes = require("./routes/suppliersRoutes");
+const promotionsRoutes = require("./routes/promotionsRoutes");
+const blogRoutes = require("./routes/blogsRoutes");
+const blogCommentRoutes = require("./routes/blogCommentsRoutes");
+const purchaseHistoryRoutes = require("./routes/purchaseHistoryRoutes");
+const repairHistoryRoutes = require("./routes/repairHistoryRoutes");
+const customerRoutes = require("./routes/customersRoutes");
 const authMiddleware = require("./middleware/auth");
 
 dotenv.config();
@@ -35,20 +44,7 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// Public route
-app.get("/api/public", (req, res) =>
-    res.json({ message: "This is a public route." })
-);
 
-// Authentication-protected routes
-app.get("/api/private", authMiddleware(), (req, res) =>
-    res.json({ message: "This is a private route.", user: req.user })
-);
-
-// Admin-only route
-app.get("/api/admin", authMiddleware("admin"), (req, res) =>
-    res.json({ message: "This is an admin route." })
-);
 
 // Main route
 app.get("/", (req, res) => res.send("API is running..."));
@@ -59,8 +55,18 @@ app.use("/api/orders", authMiddleware(), orderRoutes); // Authenticated users
 app.use("/api/products", authMiddleware(), productRoutes); // Public access
 app.use("/api/services", authMiddleware(), serviceRoutes); // Authenticated users
 app.use("/api/employees", authMiddleware(), employeeRoutes); // Admin-only
-app.use("/api/productComment", authMiddleware(), productComment); 
+app.use("/api/productComment", authMiddleware(), productCommentRoutes); 
 app.use("/api/categories",authMiddleware(), categoryRoutes);
+app.use("/api/repairAppointments", authMiddleware(), repairAppointmentsRoutes); // Authenticated users
+app.use("/api/inventory", authMiddleware(), inventoryRoutes); // Admin-only
+app.use("/api/suppliers", authMiddleware(), supplierRoutes); // Admin-only
+app.use("/api/promotions", authMiddleware(), promotionsRoutes); // Admin-only
+app.use("/api/blogs", authMiddleware(), blogRoutes); // Authenticated users
+app.use("/api/blogComments", authMiddleware(), blogCommentRoutes); // Authenticated users
+app.use("/api/purchaseHistory", authMiddleware(), purchaseHistoryRoutes); // Authenticated users
+app.use("/api/repairHistory", authMiddleware(), repairHistoryRoutes); // Authenticated users
+app.use("/api/customers", authMiddleware(), customerRoutes); // Authenticated users 
+
 
 // 404 handler
 app.use((req, res) => {
