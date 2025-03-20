@@ -1,141 +1,85 @@
-const Service = require("../models/serviceModel");
+const Service = require('../models/serviceModel');
 
-// Create a new service
 exports.createService = async (req, res) => {
-    const {
-        serviceName,
-        category,
-        price,
-        estimatedTime,
-        description,
-        available,
-    } = req.body;
-
-    try {
-        const newService = new Service({
-            serviceName,
-            category,
-            price,
-            estimatedTime,
-            description,
-            available,
-        });
-
-        await newService.save();
-        res.status(201).json({
-            message: "Service created successfully",
-            service: newService,
-        });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
+  try {
+    const newService = new Service(req.body);
+    await newService.save();
+    res.status(201).json({ message: 'Service created successfully', service: newService });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
 
-// Get all services
 exports.getAllServices = async (req, res) => {
-    try {
-        const services = await Service.find();
-        res.status(200).json(services);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
+  try {
+    const services = await Service.find();
+    res.status(200).json(services);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
 
-// Get a service by ID
 exports.getServiceById = async (req, res) => {
-    const { id } = req.params;
-
-    try {
-        const service = await Service.findById(id);
-        if (!service) {
-            return res.status(404).json({ message: "Service not found" });
-        }
-        res.status(200).json(service);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
+  try {
+    const service = await Service.findById(req.params.id);
+    if (!service) return res.status(404).json({ message: 'Service not found' });
+    res.status(200).json(service);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
 
-// Update a service
 exports.updateService = async (req, res) => {
-    const { id } = req.params;
-    const {
-        serviceName,
-        category,
-        price,
-        estimatedTime,
-        description,
-        available,
-    } = req.body;
-
-    try {
-        const service = await Service.findByIdAndUpdate(
-            id,
-            {
-                serviceName,
-                category,
-                price,
-                estimatedTime,
-                description,
-                available,
-            },
-            { new: true }
-        );
-
-        if (!service) {
-            return res.status(404).json({ message: "Service not found" });
-        }
-
-        res.status(200).json({
-            message: "Service updated successfully",
-            service,
-        });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
+  try {
+    const updatedService = await Service.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!updatedService) return res.status(404).json({ message: 'Service not found' });
+    res.status(200).json({ message: 'Service updated successfully', service: updatedService });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
 
-// Delete a service
 exports.deleteService = async (req, res) => {
-    const { id } = req.params;
-
-    try {
-        const service = await Service.findByIdAndDelete(id);
-        if (!service) {
-            return res.status(404).json({ message: "Service not found" });
-        }
-        res.status(200).json({ message: "Service deleted successfully" });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
+  try {
+    const deletedService = await Service.findByIdAndDelete(req.params.id);
+    if (!deletedService) return res.status(404).json({ message: 'Service not found' });
+    res.status(200).json({ message: 'Service deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
 
-// controllers/serviceController.js
+exports.getActiveServices = async (req, res) => {
+  try {
+    const activeServices = await Service.find({ status: 'active' });
+    res.status(200).json(activeServices);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
-exports.filterServices = async (req, res) => {
-    const { description, price, minDuration, maxDuration } = req.query;
-    let filter = {};
+exports.searchServices = async (req, res) => {
+  try {
+    const { name, category_id, status } = req.query;
+    const query = {};
+    if (name) query.name = { $regex: name, $options: 'i' };
+    if (category_id) query.category_id = category_id;
+    if (status) query.status = status;
 
-    if (description) {
-        filter.description = { $regex: description, $options: "i" }; // case-insensitive search
-    }
+    const services = await Service.find(query);
+    res.status(200).json(services);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
-    if (price) {
-        filter.price = price;
-    }
-
-    if (minDuration) {
-        filter.duration = { $gte: minDuration };
-    }
-
-    if (maxDuration) {
-        filter.duration = { ...filter.duration, $lte: maxDuration };
-    }
-
-    try {
-        const services = await Service.find(filter);
-        res.json(services);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
+exports.updateServiceStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+    const updatedService = await Service.findByIdAndUpdate(req.params.id, { status }, { new: true });
+    if (!updatedService) return res.status(404).json({ message: 'Service not found' });
+    res.status(200).json({ message: 'Service status updated successfully', service: updatedService });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };

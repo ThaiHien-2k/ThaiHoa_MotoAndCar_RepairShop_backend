@@ -5,11 +5,12 @@ const connectToDb = require("./config/db");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const accountRoutes = require("./routes/accountRoutes");
-const commentRoutes = require("./routes/commentRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const productRoutes = require("./routes/productRoutes");
+const productComment = require("./routes/productCommentRoutes");
 const serviceRoutes = require("./routes/serviceRoutes");
 const employeeRoutes = require("./routes/employeeRoutes");
+const categoryRoutes = require("./routes/categoryRoutes");
 const authMiddleware = require("./middleware/auth");
 
 dotenv.config();
@@ -53,12 +54,13 @@ app.get("/api/admin", authMiddleware("admin"), (req, res) =>
 app.get("/", (req, res) => res.send("API is running..."));
 
 // API route setup with appropriate access control
-app.use("/api/accounts", accountRoutes);
-app.use("/api/comments", authMiddleware(), commentRoutes); // Authenticated users
+app.use("/api/accounts", authMiddleware(), accountRoutes);
 app.use("/api/orders", authMiddleware(), orderRoutes); // Authenticated users
-app.use("/api/products", productRoutes); // Public access
+app.use("/api/products", authMiddleware(), productRoutes); // Public access
 app.use("/api/services", authMiddleware(), serviceRoutes); // Authenticated users
-app.use("/api/employees", authMiddleware("admin"), employeeRoutes); // Admin-only
+app.use("/api/employees", authMiddleware(), employeeRoutes); // Admin-only
+app.use("/api/productComment", authMiddleware(), productComment); 
+app.use("/api/categories",authMiddleware(), categoryRoutes);
 
 // 404 handler
 app.use((req, res) => {

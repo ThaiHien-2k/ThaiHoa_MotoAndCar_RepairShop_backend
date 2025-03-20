@@ -1,4 +1,3 @@
-// ./middleware/auth.js
 const jwt = require("jsonwebtoken");
 
 const authMiddleware = (requiredPrivilege) => (req, res, next) => {
@@ -10,10 +9,11 @@ const authMiddleware = (requiredPrivilege) => (req, res, next) => {
         req.user = decoded;
 
         if (requiredPrivilege) {
-            // Adjusting the privilege check
-            const isAdmin =
-                requiredPrivilege === "admin" && req.user.privilege === "0";
-            if (!isAdmin) {
+            const hasPrivilege = Array.isArray(requiredPrivilege)
+                ? requiredPrivilege.includes(req.user.privilege)
+                : req.user.privilege === requiredPrivilege;
+
+            if (!hasPrivilege) {
                 return res
                     .status(403)
                     .json({ message: "Forbidden: Insufficient privileges" });
@@ -22,7 +22,7 @@ const authMiddleware = (requiredPrivilege) => (req, res, next) => {
 
         next();
     } catch (error) {
-        res.status(401).json({ message: "Invalid token" });
+        res.status(401).json({ message: "Invalid token", error });
     }
 };
 

@@ -1,32 +1,43 @@
-const express = require("express");
-const authMiddleware = require("../middleware/auth");
+const express = require('express');
+const authMiddleware = require('../middleware/auth');
 const {
-    createProduct,
-    deleteProduct,
-    updateProduct,
-    getAllProducts,
-    getProductById,
-    filterProducts,
-} = require("../controllers/productController");
+  createProduct,
+  deleteProduct,
+  updateProduct,
+  getAllProducts,
+  getProductById,
+  getProductsByCategory,
+  searchProductsByName,
+  updateStock,
+  applyDiscount,
+  getProductsByStatus,
+  getRelatedProducts
+} = require('../controllers/productController');
+
 
 const router = express.Router();
 
-// Create a new product (requires authentication)
-router.post("/", authMiddleware, createProduct);
+router.post('/', authMiddleware(["0", "1"]), createProduct);
 
-// Delete a product by ID (requires authentication)
-router.delete("/:id", authMiddleware, deleteProduct);
+router.delete('/:id', authMiddleware(["0", "1"]), deleteProduct);
 
-// Update a product by ID (requires authentication)
-router.put("/:id", authMiddleware, updateProduct);
+router.put('/:id', authMiddleware(["0", "1"]), updateProduct);
 
-// Get all products (public or requires authentication, adjust as needed)
-router.get("/", getAllProducts);
+router.get('/', getAllProducts);
 
-// Get a product by ID (public or requires authentication, adjust as needed)
-router.get("/:id", getProductById);
+router.get('/:id', getProductById);
 
-// Filter products (public or requires authentication, adjust as needed)
-router.get("/filter", filterProducts);
+router.get('/category/:category_id', getProductsByCategory);
+
+router.get('/search', searchProductsByName);
+
+router.patch('/:id/stock', authMiddleware(["0", "1"]), updateStock);
+
+router.patch('/:id/discount', authMiddleware(["0", "1"]), applyDiscount);
+
+router.get('/status/:status', getProductsByStatus);
+
+router.get('/:id/related', getRelatedProducts);
+
 
 module.exports = router;

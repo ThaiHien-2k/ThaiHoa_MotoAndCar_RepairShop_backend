@@ -1,31 +1,31 @@
-const express = require("express");
-const router = express.Router();
-const authMiddleware = require("../middleware/auth");
+const express = require('express');
+const authMiddleware = require('../middleware/auth');
 const {
-    createEmployee,
-    getAllEmployees,
-    getEmployeeById,
-    updateEmployee,
-    deleteEmployee,
-    filterEmployees,
-} = require("../controllers/employeeController");
+  createEmployee,
+  getAllEmployees,
+  getActiveEmployees,
+  getEmployeeById,
+  updateEmployee,
+  deleteEmployee,
+  updateEmployeeStatus,
+  updateEmployeeSalary,
+  addPerformanceReview,
+  addLeaveRecord,
+  searchEmployees
+} = require('../controllers/employeeController');
 
-// Create a new employee (requires admin privilege)
-router.post("/", authMiddleware("admin"), createEmployee);
+const router = express.Router();
 
-// Get all employees (requires authentication)
-router.get("/", authMiddleware, getAllEmployees);
-
-// Get employee by ID (requires authentication)
-router.get("/:id", authMiddleware, getEmployeeById);
-
-// Update employee by ID (requires admin privilege)
-router.put("/:id", authMiddleware("admin"), updateEmployee);
-
-// Delete employee by ID (requires admin privilege)
-router.delete("/:id", authMiddleware("admin"), deleteEmployee);
-
-// Filter employees based on query parameters (requires authentication)
-router.get("/filter", authMiddleware, filterEmployees);
+router.post('/', authMiddleware(["0", "1"]), createEmployee);
+router.get('/', authMiddleware(["0", "1"]), getAllEmployees);
+router.get('/active', authMiddleware(["0", "1"]), getActiveEmployees);
+router.get('/search', authMiddleware(["0", "1"]), searchEmployees);
+router.get('/:id', authMiddleware(["0", "1"]), getEmployeeById);
+router.put('/:id', authMiddleware(["0", "1"]), updateEmployee);
+router.delete('/:id', authMiddleware(["0", "1"]), deleteEmployee);
+router.patch('/:id/status', authMiddleware(["0", "1"]), updateEmployeeStatus);
+router.patch('/:id/salary', authMiddleware(["0", "1"]), updateEmployeeSalary);
+router.patch('/:id/performance-review', authMiddleware(["0", "1"]), addPerformanceReview);
+router.patch('/:id/leave-record', authMiddleware(["0", "1"]), addLeaveRecord);
 
 module.exports = router;

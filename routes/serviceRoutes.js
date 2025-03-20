@@ -1,31 +1,25 @@
-const express = require("express");
-const router = express.Router();
+const express = require('express');
+const authMiddleware = require('../middleware/auth');
 const {
-    createService,
-    getAllServices,
-    getServiceById,
-    updateService,
-    deleteService,
-    filterServices,
-} = require("../controllers/serviceController");
-const authMiddleware = require("../middleware/auth");
+  createService,
+  getAllServices,
+  getServiceById,
+  updateService,
+  deleteService,
+  getActiveServices,
+  searchServices,
+  updateServiceStatus
+} = require('../controllers/serviceController');
 
-// Route to create a new service (requires authentication)
-router.post("/", authMiddleware, createService);
+const router = express.Router();
 
-// Route to get all services (public or requires authentication, adjust as needed)
-router.get("/", getAllServices);
-
-// Route to get a service by ID (public or requires authentication, adjust as needed)
-router.get("/:id", getServiceById);
-
-// Route to update a service by ID (requires authentication)
-router.put("/:id", authMiddleware, updateService);
-
-// Route to delete a service by ID (requires authentication)
-router.delete("/:id", authMiddleware, deleteService);
-
-// Route to filter services (public or requires authentication, adjust as needed)
-router.get("/filter", filterServices);
+router.post('/', authMiddleware(["0", "1"]), createService);
+router.get('/', getAllServices);
+router.get('/active', getActiveServices);
+router.get('/search', searchServices);
+router.get('/:id', getServiceById);
+router.put('/:id', authMiddleware(["0", "1"]), updateService);
+router.delete('/:id', authMiddleware(["0", "1"]), deleteService);
+router.patch('/:id/status', authMiddleware(["0", "1"]), updateServiceStatus);
 
 module.exports = router;

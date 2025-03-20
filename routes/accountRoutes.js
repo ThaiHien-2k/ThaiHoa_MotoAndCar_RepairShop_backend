@@ -1,29 +1,40 @@
-const express = require("express");
+// routes/accountRoutes.js
+const express = require('express');
+const authMiddleware = require('../middleware/auth');
 const {
-    createAccount,
-    deleteAccount,
-    changePassword,
-    changePrivilege,
-    renameAccount,
-    getAllAccounts,
-    getAccountById,
-    getFilteredAccounts,
-    login,
-    logout,
-} = require("../controllers/accountController");
-const authMiddleware = require("../middleware/auth");
+  createAccount,
+  getAllAccounts,
+  getAccountById,
+  updateAccount,
+  deleteAccount,
+  changePassword,
+  toggleAccountStatus,
+  filterAccountsByPrivilege,
+  updateAccountName,
+  getActiveAccounts,
+  changeAccountPrivilege,
+  login,
+  logout,
+  forgotPassword
+} = require('../controllers/accountController');
 
 const router = express.Router();
 
-router.post("/create", createAccount);
-router.delete("/:id/delete", authMiddleware("admin"), deleteAccount);
-router.put("/:id/password", authMiddleware(), changePassword); // No specific privilege needed
-router.put("/:id/privilege", authMiddleware("admin"), changePrivilege);
-router.put("/:id/rename", authMiddleware(), renameAccount); // No specific privilege needed
-router.get("/", authMiddleware(), getAllAccounts); // No specific privilege needed
-router.get("/:id", authMiddleware(), getAccountById); // No specific privilege needed
-router.get("/filter", authMiddleware(), getFilteredAccounts); // No specific privilege needed
-router.post("/login", login);
-router.post("/logout", authMiddleware(), logout); // No specific privilege needed
+router.post('/', createAccount);
+router.get('/', authMiddleware(["0", "1"]), getAllAccounts);
+router.get('/:id', authMiddleware(["0", "1"]), getAccountById);
+router.put('/:id', authMiddleware(["0", "1"]), updateAccount);
+router.delete('/:id', authMiddleware(["0", "1"]), deleteAccount);
+router.put('/:id/password', authMiddleware(["0", "1"]), changePassword);
+router.patch('/:id/status', authMiddleware(["0", "1"]), toggleAccountStatus);
+router.get('/filter/privilege/:privilege', authMiddleware(["0", "1"]), filterAccountsByPrivilege);
+router.put('/:id/name', authMiddleware(["0", "1"]), updateAccountName);
+router.get('/active', authMiddleware(["0", "1"]), getActiveAccounts);
+router.put('/:id/privilege', authMiddleware(["0", "1"]), changeAccountPrivilege);
+
+// Auth routes
+router.post('/login', login);
+router.post('/logout', authMiddleware(["0", "1"]), logout);
+router.post('/forgot-password', forgotPassword);
 
 module.exports = router;

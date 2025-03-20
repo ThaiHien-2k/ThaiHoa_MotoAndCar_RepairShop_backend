@@ -1,154 +1,118 @@
-const Employee = require("../models/employeeModel");
-const Account = require("../models/accountModel");
+const Employee = require('../models/employeeModel');
 
 exports.createEmployee = async (req, res) => {
-    const {
-        name,
-        email,
-        phone,
-        address,
-        position,
-        salary,
-        dateOfBirth,
-        accountId,
-    } = req.body;
-
-    try {
-        const newEmployee = new Employee({
-            name,
-            email,
-            phone,
-            address,
-            position,
-            salary,
-            dateOfBirth,
-            account: accountId,
-        });
-
-        await newEmployee.save();
-        res.status(201).json({
-            message: "Employee created successfully",
-            employee: newEmployee,
-        });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
+  try {
+    const newEmployee = new Employee(req.body);
+    await newEmployee.save();
+    res.status(201).json({ message: 'Employee created successfully', employee: newEmployee });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
 
 exports.getAllEmployees = async (req, res) => {
-    try {
-        const employees = await Employee.find().populate(
-            "account",
-            "name email"
-        );
-        res.json(employees);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
+  try {
+    const employees = await Employee.find();
+    res.status(200).json(employees);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.getActiveEmployees = async (req, res) => {
+  try {
+    const activeEmployees = await Employee.find({ status: 'active' });
+    res.status(200).json(activeEmployees);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
 
 exports.getEmployeeById = async (req, res) => {
-    const { id } = req.params;
-
-    try {
-        const employee = await Employee.findById(id).populate(
-            "account",
-            "name email"
-        );
-        if (!employee) {
-            return res.status(404).json({ message: "Employee not found" });
-        }
-        res.json(employee);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
+  try {
+    const employee = await Employee.findById(req.params.id);
+    if (!employee) return res.status(404).json({ message: 'Employee not found' });
+    res.status(200).json(employee);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
 
 exports.updateEmployee = async (req, res) => {
-    const { id } = req.params;
-    const {
-        name,
-        email,
-        phone,
-        address,
-        position,
-        salary,
-        dateOfBirth,
-        accountId,
-    } = req.body;
-
-    try {
-        const updatedEmployee = await Employee.findByIdAndUpdate(
-            id,
-            {
-                name,
-                email,
-                phone,
-                address,
-                position,
-                salary,
-                dateOfBirth,
-                account: accountId,
-            },
-            { new: true }
-        );
-
-        if (!updatedEmployee) {
-            return res.status(404).json({ message: "Employee not found" });
-        }
-        res.json({
-            message: "Employee updated successfully",
-            employee: updatedEmployee,
-        });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
+  try {
+    const updatedEmployee = await Employee.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!updatedEmployee) return res.status(404).json({ message: 'Employee not found' });
+    res.status(200).json({ message: 'Employee updated successfully', employee: updatedEmployee });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
 
 exports.deleteEmployee = async (req, res) => {
-    const { id } = req.params;
-
-    try {
-        const employee = await Employee.findByIdAndDelete(id);
-        if (!employee) {
-            return res.status(404).json({ message: "Employee not found" });
-        }
-        res.json({ message: "Employee deleted successfully" });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
+  try {
+    const deletedEmployee = await Employee.findByIdAndDelete(req.params.id);
+    if (!deletedEmployee) return res.status(404).json({ message: 'Employee not found' });
+    res.status(200).json({ message: 'Employee deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
 
-// Filter function
-exports.filterEmployees = async (req, res) => {
-    const { name, position, minSalary, maxSalary } = req.query;
-    let filter = {};
+exports.updateEmployeeStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+    const updatedEmployee = await Employee.findByIdAndUpdate(req.params.id, { status }, { new: true });
+    if (!updatedEmployee) return res.status(404).json({ message: 'Employee not found' });
+    res.status(200).json({ message: 'Employee status updated successfully', employee: updatedEmployee });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
-    if (name) {
-        filter.name = { $regex: name, $options: "i" }; // Case-insensitive search
-    }
+exports.updateEmployeeSalary = async (req, res) => {
+  try {
+    const { salary } = req.body;
+    const updatedEmployee = await Employee.findByIdAndUpdate(req.params.id, { salary }, { new: true });
+    if (!updatedEmployee) return res.status(404).json({ message: 'Employee not found' });
+    res.status(200).json({ message: 'Employee salary updated successfully', employee: updatedEmployee });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
-    if (position) {
-        filter.position = position;
-    }
+exports.addPerformanceReview = async (req, res) => {
+  try {
+    const { performance_review } = req.body;
+    const updatedEmployee = await Employee.findByIdAndUpdate(req.params.id, { $push: { performance_reviews: performance_review } }, { new: true });
+    if (!updatedEmployee) return res.status(404).json({ message: 'Employee not found' });
+    res.status(200).json({ message: 'Performance review added successfully', employee: updatedEmployee });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
-    if (minSalary || maxSalary) {
-        filter.salary = {};
-        if (minSalary) {
-            filter.salary.$gte = minSalary; // Greater than or equal to minSalary
-        }
-        if (maxSalary) {
-            filter.salary.$lte = maxSalary; // Less than or equal to maxSalary
-        }
-    }
+exports.addLeaveRecord = async (req, res) => {
+  try {
+    const { leave_record } = req.body;
+    const updatedEmployee = await Employee.findByIdAndUpdate(req.params.id, { $push: { leave_records: leave_record } }, { new: true });
+    if (!updatedEmployee) return res.status(404).json({ message: 'Employee not found' });
+    res.status(200).json({ message: 'Leave record added successfully', employee: updatedEmployee });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
-    try {
-        const employees = await Employee.find(filter).populate(
-            "account",
-            "name email"
-        );
-        res.json(employees);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
+exports.searchEmployees = async (req, res) => {
+  try {
+    const { name, position, employment_type, status } = req.query;
+    const query = {};
+    if (name) query.name = { $regex: name, $options: 'i' };
+    if (position) query.position = position;
+    if (employment_type) query.employment_type = employment_type;
+    if (status) query.status = status;
+    const employees = await Employee.find(query);
+    res.status(200).json(employees);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };

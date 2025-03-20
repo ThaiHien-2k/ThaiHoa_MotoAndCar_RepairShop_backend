@@ -1,38 +1,16 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const serviceSchema = new mongoose.Schema({
-    serviceName: {
-        type: String,
-        required: true,
-        trim: true,
-    },
-    category: {
-        type: Number,
-        required: true,
-        enum: [0, 1, 2], // 0: motorbike, 1: car, 2: another
-    },
-    price: {
-        type: Number,
-        required: true,
-    },
-    estimatedTime: {
-        type: Number,
-        required: true,
-    },
-    description: {
-        type: String,
-        trim: true,
-    },
-    available: {
-        type: Boolean,
-        default: true,
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now,
-    },
+  name: { type: String, required: true },
+  price: { type: Number, required: true },
+  duration: { type: String, required: true },
+  description: { type: String },
+  status: { type: String, enum: ['active', 'inactive'], default: 'active' },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now },
+  category_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true },
+  required_parts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
+  employee_specialization: [{ type: String }]
 });
 
-const Service = mongoose.model("Service", serviceSchema);
-
-module.exports = Service;
+module.exports = mongoose.model('Service', serviceSchema);
