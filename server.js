@@ -50,7 +50,7 @@ app.use(limiter);
 app.get("/", (req, res) => res.send("API is running..."));
 
 // API route setup with appropriate access control
-app.use("/api/accounts", authMiddleware(), accountRoutes);
+app.use("/api/accounts", accountRoutes);
 app.use("/api/orders", authMiddleware(), orderRoutes); // Authenticated users
 app.use("/api/products", authMiddleware(), productRoutes); // Public access
 app.use("/api/services", authMiddleware(), serviceRoutes); // Authenticated users

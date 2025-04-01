@@ -58,9 +58,9 @@ exports.login = async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    if (!account.is_active) {
-      return res.status(403).json({ message: 'Account is inactive' });
-    }
+    // if (!account.is_active) {
+    //   return res.status(403).json({ message: 'Account is inactive' });
+    // }
 
     const token = jwt.sign(
       { id: account._id, privilege: account.privilege },
@@ -136,11 +136,32 @@ exports.logout = (req, res) => {
   
   exports.updateAccount = async (req, res) => {
     try {
-      const updatedAccount = await Account.findByIdAndUpdate(req.params.id, req.body, { new: true });
-      if (!updatedAccount) return res.status(404).json({ message: 'Account not found' });
+      const { name, privilege, password, role_description, is_active } = req.body;
   
-      res.status(200).json(updatedAccount);
+      
+      let hashedPassword = password;
+      if (password) {
+        const salt = await bcrypt.genSalt(10);
+        hashedPassword = await bcrypt.hash(password, salt);
+      }
+  
+      const updateData = {
+        name,
+        privilege,
+        password: hashedPassword,
+        role_description,
+        is_active,
+        updatedAt: Date.now(),
+      };
+  
+      const updatedAccount = await Account.findByIdAndUpdate(req.params.id, updateData, { new: true });
+      if (!updatedAccount) {
+        return res.status(404).json({ message: 'Account not found' });
+      }
+  
+      res.status(200).json({ message: 'Update success' });
     } catch (error) {
+      console.error('Error updating account:', error);
       res.status(500).json({ message: 'Error updating account', error });
     }
   };
