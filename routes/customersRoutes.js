@@ -9,7 +9,7 @@ router.get('/:id', authMiddleware(['0', '1', '2']), customerController.getCustom
 router.put('/:id', authMiddleware(['0', '1']), customerController.updateCustomer);
 router.delete('/:id', authMiddleware(['0']), customerController.deleteCustomer);
 router.get('/account/:accountId', authMiddleware(['0', '1', '2']), customerController.getCustomerByAccountId);
-router.patch('/:id/points', authMiddleware(['0', '1']), customerController.updateLoyaltyPoints);
-router.get('/referral/:referralCode', authMiddleware(['0', '1', '2']), customerController.getCustomersByReferralCode);
+router.post('/has_customer', authMiddleware(["0", "1"]), customerController.hasCustomer);
+
 
 module.exports = router;

@@ -11,6 +11,7 @@ const accountSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now },
   last_login: { type: Date },
   role_description: { type: String },
+  avatar: { type: String},
   is_active: { type: Boolean, default: true }
 });
 

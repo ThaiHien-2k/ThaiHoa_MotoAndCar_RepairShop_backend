@@ -27,17 +27,6 @@ router.get('/', getAllProducts);
 
 router.get('/:id', getProductById);
 
-router.get('/category/:category_id', getProductsByCategory);
-
-router.get('/search', searchProductsByName);
-
-router.patch('/:id/stock', authMiddleware(["0", "1"]), updateStock);
-
-router.patch('/:id/discount', authMiddleware(["0", "1"]), applyDiscount);
-
-router.get('/status/:status', getProductsByStatus);
-
-router.get('/:id/related', getRelatedProducts);
 
 
 module.exports = router;

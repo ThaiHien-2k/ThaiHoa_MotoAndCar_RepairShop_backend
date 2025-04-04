@@ -49,17 +49,24 @@ exports.getCustomerById = async (req, res) => {
 
 exports.updateCustomer = async (req, res) => {
   try {
-    const customer = await Customer.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const customer = await Customer.findOneAndUpdate(
+      { accounts_id: req.params.id }, 
+      req.body,                        
+      { new: true }                     
+    );
+
     if (!customer) return res.status(404).json({ error: 'Customer not found' });
+
     res.status(200).json(customer);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
 
+
 exports.deleteCustomer = async (req, res) => {
   try {
-    const customer = await Customer.findByIdAndDelete(req.params.id);
+    const customer = await Customer.findOneAndDelete({ accounts_id: req.params.id });
     if (!customer) return res.status(404).json({ error: 'Customer not found' });
     res.status(200).json({ message: 'Customer deleted successfully' });
   } catch (error) {
@@ -77,26 +84,29 @@ exports.getCustomerByAccountId = async (req, res) => {
   }
 };
 
-exports.updateLoyaltyPoints = async (req, res) => {
+
+
+
+
+exports.hasCustomer = async (req, res) => {
   try {
-    const { points } = req.body;
-    const customer = await Customer.findById(req.params.id);
-    if (!customer) return res.status(404).json({ error: 'Customer not found' });
+    const { id } = req.body;
 
-    customer.loyalty_points += points;
-    await customer.save();
+    if (!id) {
+      return res.status(400).json({ exists: false, message: 'Missing account ID in request body' });
+    }
 
-    res.status(200).json({ message: 'Loyalty points updated', loyalty_points: customer.loyalty_points });
+    const customer = await Customer.findOne({ accounts_id: id });
+
+    if (!customer) {
+      return res.status(200).json({ exists: false, message: 'Customer not found' });
+    }
+
+    return res.status(200).json({ exists: true, customer });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error checking customer:', error);
+    return res.status(500).json({ exists: false, message: 'Internal server error' });
   }
 };
 
-exports.getCustomersByReferralCode = async (req, res) => {
-  try {
-    const customers = await Customer.find({ referral_code: req.params.referralCode });
-    res.status(200).json(customers);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+

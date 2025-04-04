@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const productSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  category_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true }, // Đúng kiểu ObjectId
+  // category_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true }, // Đúng kiểu ObjectId
   brand: { type: String, required: true },
   price: { type: Number, required: true },
   stock_quantity: { type: Number, required: true },
@@ -11,7 +11,7 @@ const productSchema = new mongoose.Schema({
   status: { type: String, enum: ['active', 'inactive'], default: 'active' },
   average_rating: { type: Number, default: 0 },
   ratings_count: { type: Number, default: 0 },
-  supplier_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Supplier', required: true }, // Sửa đúng tên và kiểu
+  // supplier_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Supplier', required: true }, // Sửa đúng tên và kiểu
   createdAt: { type: Date, default: Date.now },
   specifications: {
     size: { type: String },

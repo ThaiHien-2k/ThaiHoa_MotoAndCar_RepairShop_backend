@@ -21,6 +21,7 @@ const purchaseHistoryRoutes = require("./routes/purchaseHistoryRoutes");
 const repairHistoryRoutes = require("./routes/repairHistoryRoutes");
 const customerRoutes = require("./routes/customersRoutes");
 const authMiddleware = require("./middleware/auth");
+const path = require('path');
 
 dotenv.config();
 
@@ -35,8 +36,15 @@ connectToDb();
 const app = express();
 
 // Security and rate-limiting middleware
-app.use(cors());
-app.use(helmet()); // Adds security headers
+app.use(cors({
+    origin: 'http://localhost:3000', 
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+  }));
+  app.use(helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+}));
 app.use(express.json());
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
@@ -45,7 +53,8 @@ const limiter = rateLimit({
 app.use(limiter);
 
 
-
+app.use('/uploads', express.static('uploads'));
+app.use('/avatar', express.static('uploads'));
 // Main route
 app.get("/", (req, res) => res.send("API is running..."));
 
