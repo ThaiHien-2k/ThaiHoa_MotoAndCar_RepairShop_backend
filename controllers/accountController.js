@@ -87,7 +87,6 @@ exports.login = async (req, res) => {
     }
 
     const normalizedEmail = email.toLowerCase().trim();
-
     const account = await Account.findOne({ email: normalizedEmail });
 
     if (!account) {
@@ -120,6 +119,7 @@ exports.login = async (req, res) => {
     res.status(500).json({ message: 'Error during login', error: error.message });
   }
 };
+
 
 // Logout
 exports.logout = (req, res) => {

@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const productSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  // category_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true }, // Đúng kiểu ObjectId
+  category_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true }, // Đúng kiểu ObjectId
   brand: { type: String, required: true },
   price: { type: Number, required: true },
   stock_quantity: { type: Number, required: true },
