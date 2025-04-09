@@ -236,13 +236,23 @@ exports.deleteAccount = async (req, res) => {
 exports.changePassword = async (req, res) => {
   try {
     const account = await Account.findById(req.params.id);
-    if (!account) return res.status(404).json({ message: 'Account not found' });
+    if (!account) {
+      return res.status(404).json({ message: 'Account not found' });
+    }
 
-    account.password = await bcrypt.hash(req.body.password, 10);
+    const { oldPassword, newPassword } = req.body.oldPassword;
+
+    const isMatch = await bcrypt.compare(oldPassword, account.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Old password is incorrect' });
+    }
+
+    account.password = await bcrypt.hash(newPassword, 10);
     await account.save();
 
     res.status(200).json({ message: 'Password updated successfully' });
   } catch (error) {
+    console.error('Error changing password:', error);
     res.status(500).json({ message: 'Error changing password', error });
   }
 };
