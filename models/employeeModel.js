@@ -44,6 +44,14 @@ const LeaveRecordSchema = new mongoose.Schema({
   reason: { type: String, required: true }
 });
 
+// NEW: Bank Account Schema
+const BankAccountSchema = new mongoose.Schema({
+  account_name: { type: String, required: true },
+  account_number: { type: String, required: true },
+  bank_name: { type: String, required: true },
+  expiry_date: { type: String, required: true }
+});
+
 const EmployeeSchema = new mongoose.Schema({
   name: { type: String, required: true },
   position: { type: String, required: true },
@@ -55,7 +63,7 @@ const EmployeeSchema = new mongoose.Schema({
   specializations: [{ type: String }],
   salary: SalarySchema,
   performance_reviews: [PerformanceReviewSchema],
-  bank_account: { type: String },
+  bank_account: BankAccountSchema,
   leave_records: [LeaveRecordSchema],
   certifications: [{ type: String }]
 }, { timestamps: true });

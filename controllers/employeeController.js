@@ -116,3 +116,25 @@ exports.searchEmployees = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+
+exports.hasEmployee = async (req, res) => {
+  try {
+    const { id } = req.body;
+
+    if (!id) {
+      return res.status(400).json({ exists: false, message: 'Missing account ID in request body' });
+    }
+
+    const employee = await Employee.findOne({ accounts_id: id });
+
+    if (!employee) {
+      return res.status(200).json({ exists: false, message: 'Employee not found' });
+    }
+
+    return res.status(200).json({ exists: true, employee });
+  } catch (error) {
+    console.error('Error checking employee:', error);
+    return res.status(500).json({ exists: false, message: 'Internal server error' });
+  }
+};
