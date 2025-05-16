@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const AllowanceSchema = new mongoose.Schema({
   type: { type: String, required: true },
-  amount: { type: Number, required: true }
+  amount: { type: String, required: true }
 });
 
 const DeductionSchema = new mongoose.Schema({

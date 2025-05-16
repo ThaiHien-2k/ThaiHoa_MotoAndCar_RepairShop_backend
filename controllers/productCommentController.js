@@ -155,3 +155,65 @@ exports.changeCommentStatus = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+
+exports.getAllComments = async (req, res) => {
+  try {
+    const comments = await ProductComment.find()
+      // .populate('customer_id', 'name')
+      .sort({ createdAt: -1 });
+
+    res.status(200).json(comments);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.getCommentsById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const comment = await ProductComment.findById(id);
+    if (!comment) {
+      return res.status(404).json({ message: 'Comment not found' });
+    }
+    res.status(200).json(comment);
+  }
+  catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
+exports.addReply = async (req, res) => {
+  try {
+    const { comment_id, accounts_id, author, content } = req.body;
+
+    if (!comment_id || !accounts_id || !author || !content) {
+      return res.status(400).json({ message: 'Missing required fields' });
+    }
+
+    const updatedComment = await ProductComment.findByIdAndUpdate(
+      comment_id,
+      {
+        $push: {
+          replies: {
+            accounts_id,
+            author,
+            content
+          }
+        }
+      },
+      { new: true }
+    );
+
+    if (!updatedComment) {
+      return res.status(404).json({ message: 'Comment not found' });
+    }
+
+    res.status(200).json({
+      message: 'Reply added successfully',
+      replies: updatedComment.replies
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
